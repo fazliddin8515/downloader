@@ -1,12 +1,24 @@
 import aiogram
 import os
+import aiogram.filters
 import dotenv
 import asyncio
+import yt_dlp
 
 dotenv.load_dotenv()
 
 bot = aiogram.Bot(os.getenv("BOT_TOKEN"))
 dp = aiogram.Dispatcher()
+
+
+@dp.message(aiogram.filters.Command("start"))
+def start_handler(message: aiogram.types.Message):
+    url = "https://youtube.com/shorts/fPgci5utcyU?si=qvnfDGxNxHGy0btM"
+    opts = {"format": "best", "outtmpl": "video.%(ext)s"}
+
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.download([url])
+        print(info)
 
 
 def on_start():
