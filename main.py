@@ -1,9 +1,9 @@
 import aiogram
 import os
-import aiogram.filters
 import dotenv
 import asyncio
 import yt_dlp
+import random
 
 dotenv.load_dotenv()
 
@@ -11,14 +11,19 @@ bot = aiogram.Bot(os.getenv("BOT_TOKEN"))
 dp = aiogram.Dispatcher()
 
 
-@dp.message(aiogram.filters.Command("start"))
-def start_handler(message: aiogram.types.Message):
-    url = "https://youtube.com/shorts/fPgci5utcyU?si=qvnfDGxNxHGy0btM"
-    opts = {"format": "best", "outtmpl": "video.%(ext)s"}
+@dp.message()
+async def start_handler(message: aiogram.types.Message):
+    url = message.text
+    filename = random.randint(1, 100)  # 12
+    opts = {"format": "best", "outtmpl": f"{filename}.%(ext)s"}
 
-    with yt_dlp.YoutubeDL(opts) as ydl:
-        info = ydl.download([url])
-        print(info)
+    yt_dlp.YoutubeDL(opts).download(url)
+
+    video = aiogram.types.FSInputFile(f"{filename}.mp4")
+
+    await message.answer_video(video)
+
+    os.remove(f"{filename}.mp4")
 
 
 def on_start():
