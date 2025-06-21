@@ -26,11 +26,12 @@ async def start_handler(message: aiogram.types.Message):
         filename = random.randint(1, 100)
         opts = {"format": "best", "outtmpl": f"{filename}.%(ext)s"}
 
-        yt_dlp.YoutubeDL(opts).download(url)
+        await message.answer("video is downloading, please wait a moment...")
+
+        video_info = yt_dlp.YoutubeDL(opts).extract_info(url, download=True)
 
         video = aiogram.types.FSInputFile(f"{filename}.mp4")
-
-        await message.answer_video(video)
+        await message.answer_video(video, caption=video_info["title"])
 
         os.remove(f"{filename}.mp4")
     else:
