@@ -11,19 +11,30 @@ bot = aiogram.Bot(os.getenv("BOT_TOKEN"))
 dp = aiogram.Dispatcher()
 
 
+def is_valid_url(url: str):
+    if url.startswith("https://youtube.com/"):
+        return True
+    else:
+        return False
+
+
 @dp.message()
 async def start_handler(message: aiogram.types.Message):
     url = message.text
-    filename = random.randint(1, 100)  # 12
-    opts = {"format": "best", "outtmpl": f"{filename}.%(ext)s"}
 
-    yt_dlp.YoutubeDL(opts).download(url)
+    if is_valid_url(url):
+        filename = random.randint(1, 100)
+        opts = {"format": "best", "outtmpl": f"{filename}.%(ext)s"}
 
-    video = aiogram.types.FSInputFile(f"{filename}.mp4")
+        yt_dlp.YoutubeDL(opts).download(url)
 
-    await message.answer_video(video)
+        video = aiogram.types.FSInputFile(f"{filename}.mp4")
 
-    os.remove(f"{filename}.mp4")
+        await message.answer_video(video)
+
+        os.remove(f"{filename}.mp4")
+    else:
+        await message.answer(f"{url} is not valid url.")
 
 
 def on_start():
