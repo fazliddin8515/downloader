@@ -4,6 +4,7 @@ import dotenv
 import asyncio
 import yt_dlp
 import random
+import re
 
 dotenv.load_dotenv()
 
@@ -12,14 +13,17 @@ dp = aiogram.Dispatcher()
 
 
 def is_valid_url(url: str):
-    if url.startswith("https://youtube.com/"):
+    if re.match(
+        "https?://(www\.)?(youtube\.com|youtu\.be|tiktok\.com|instagram\.com)/[^\s]+",
+        url,
+    ):
         return True
     else:
         return False
 
 
 @dp.message()
-async def start_handler(message: aiogram.types.Message):
+async def message_handler(message: aiogram.types.Message):
     url = message.text
 
     if is_valid_url(url):
